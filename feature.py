@@ -13,7 +13,7 @@ print(I.shape)
 t = 4  # design parameter: threshold
 h = 5  # design parameter: window size
 num_classes = 5
-num_samples_each_class = 10
+num_samples_each_class = 100
 
 # (width, height) = I.shape
 width = 20    # for testing assign smaller values
@@ -162,21 +162,8 @@ def lph(x, y):     # inserted two arguments
 
     featuredata = np.vstack(lpdata)
     return featuredata
-    # return lpdata
 
-# LPH = lph()
-# print(LPH.shape)
-# cv2.imshow('image', img)
-# print(LPH)  # it should print  features corresponding to all pixels
-# saving features in pickle
-'''
-with open('mlph_features.dat', "wb") as f:
-    pickle.dump(LPH, f)
 
-with open('mlph_features.dat', 'rb') as f:
-    print(pickle.load(f))
-
-'''
 ''' Read Ground truth images for training
 5 classes and labels are given below
 lw -> water ->1
@@ -219,39 +206,46 @@ def get_sample_index(image):
     np.random.shuffle(coordinate)
     return coordinate[0:num_samples_each_class, 0], coordinate[0:num_samples_each_class, 1]
 
+index_x = np.zeros(num_samples_each_class*num_classes, dtype=int)
+index_y = np.zeros(num_samples_each_class*num_classes, dtype=int)
 
-# index = np.argwhere(lw)
-# print(coordinates.shape)
-# print(index[:10])
-# np.random.shuffle(index)
-# print(index[0:10])
+# for water(1)
+index_x[0:num_samples_each_class], index_y[0:num_samples_each_class] = get_sample_index(lw)
 
-# print(lw[index[0:100, 0], index[0:100, 1]])
-# print(type(index))
+# for flood plane(2)
+index_x[num_samples_each_class:2*num_samples_each_class], index_y[num_samples_each_class:2*num_samples_each_class] = get_sample_index(lf)
 
-sample_index_x = []
-sample_index_y = []
-# for water
-index_x, index_y = get_sample_index(lw)
-sample_index_x.append(index_x)
-sample_index_y.append(index_y)
-'''
-# for flood plane
-index_x, index_y = get_sample_index(lf)
-sample_index_x.append(index_x)
-sample_index_y.append(index_y)
-'''
-sample_index_x = np.array(sample_index_x)
-sample_index_y = np.array(sample_index_y)
+# for irrigation(3)
+index_x[2*num_samples_each_class:3*num_samples_each_class], index_y[2*num_samples_each_class:3*num_samples_each_class] = get_sample_index(li)
 
-print(sample_index_x[0])
-print(index_x)
+# for vegetation(4)
+index_x[3*num_samples_each_class:4*num_samples_each_class], index_y[3*num_samples_each_class:4*num_samples_each_class] = get_sample_index(lv)
+
+# for urban(5)
+index_x[4*num_samples_each_class:5*num_samples_each_class], index_y[4*num_samples_each_class:5*num_samples_each_class] = get_sample_index(lu)
+
+# print(index_x)
 # print(index_y)
-print(len(index_x))
+# print(len(index_x))
 
-LPH = lph(sample_index_x[0], sample_index_y[0])    # lph should be calculated for 100 coordinates
+LPH = lph(index_x, index_y)    # lph should be calculated for 100 coordinates
 
-print(LPH)
+# print(LPH)
 print(LPH.shape)
-# test(x)
+
+# saving training features in pickle
+with open('train_features.dat', "wb") as f:
+    pickle.dump(LPH, f)
+
+with open('train_features.dat', 'rb') as f:
+    print(pickle.load(f))
+
+# saving true class data in pickle
+with open('target_class.dat', "wb") as f:
+    pickle.dump(true_data, f)
+
+with open('target_class.dat', 'rb') as f:
+    print(pickle.load(f))
+
+
 cv2.waitKey(0)
