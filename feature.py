@@ -12,6 +12,8 @@ print(I.shape)
 
 t = 4  # design parameter: threshold
 h = 5  # design parameter: window size
+num_classes = 5
+num_samples_each_class = 10
 
 # (width, height) = I.shape
 width = 20    # for testing assign smaller values
@@ -128,18 +130,18 @@ def lph(x, y):     # inserted two arguments
     se = np.zeros((h, h), dtype=np.int)
     sn = np.zeros((h, h), dtype=np.int)
     # for x in range(win, width-win):
-    while x:
-        #for y in range(win, height-win):
-        while y:
+    for i in range(0, len(x)):
+        # for y in range(win, height-win):
+        # for j in range(0, len(y)):
 
             for hw in range(-win, win+1):
                 for hh in range(-win, win+1):
 
-                    if I[x+hw, y+hh] > (I[x, y]+t):
+                    if I[x[i]+hw, y[i]+hh] > (I[x[i], y[i]]+t):
                         sp[hw+win][hh+win] = 1
-                    elif (I[x, y]-t) <= I[x+hw, y+hh] <= (I[x, y]+t):
+                    elif (I[x[i], y[i]]-t) <= I[x[i]+hw, y[i]+hh] <= (I[x[i], y[i]]+t):
                         se[hw+win][hh+win] = 1
-                    elif I[x+hw, y+hh] < (I[x, y]-t):
+                    elif I[x[i]+hw, y[i]+hh] < (I[x[i], y[i]]-t):
                         sn[hw+win][hh+win] = 1
             # print('sp', sp)
             # print('se', se)
@@ -189,6 +191,14 @@ lf = cv2.imread("new_clipped_floodplain.png", 0)
 li = cv2.imread("new_clipped_irrigation.png", 0)
 lv = cv2.imread("new_clipped_vegetation.png", 0)
 lu = cv2.imread("new_clipped_urban.png", 0)
+
+true_data = np.zeros(num_samples_each_class*num_classes, dtype=int)
+true_data[0:num_samples_each_class] = 1
+true_data[num_samples_each_class:2*num_samples_each_class] = 2
+true_data[2*num_samples_each_class:3*num_samples_each_class] = 3
+true_data[3*num_samples_each_class:4*num_samples_each_class] = 4
+true_data[4*num_samples_each_class:5*num_samples_each_class] = 5
+# print(true_data)
 '''
 print(lw.shape)
 print(np.unique(lw, return_counts=True))
@@ -203,19 +213,45 @@ print(lu.shape)
 print(np.unique(lu, return_counts=True))
 '''
 
-index = np.argwhere(lw)
+
+def get_sample_index(image):
+    coordinate = np.argwhere(image)
+    np.random.shuffle(coordinate)
+    return coordinate[0:num_samples_each_class, 0], coordinate[0:num_samples_each_class, 1]
+
+
+# index = np.argwhere(lw)
 # print(coordinates.shape)
 # print(index[:10])
-np.random.shuffle(index)
+# np.random.shuffle(index)
 # print(index[0:10])
 
 # print(lw[index[0:100, 0], index[0:100, 1]])
 # print(type(index))
-x = index[0:10, 0]
-y = index[0:10, 1]
-print(x)
-print(y)
-# LPH = lph(x, y)    # lph should be calculated for 100 coordinates
-# print(LPH)
-# print(LPH.shape)
+
+sample_index_x = []
+sample_index_y = []
+# for water
+index_x, index_y = get_sample_index(lw)
+sample_index_x.append(index_x)
+sample_index_y.append(index_y)
+'''
+# for flood plane
+index_x, index_y = get_sample_index(lf)
+sample_index_x.append(index_x)
+sample_index_y.append(index_y)
+'''
+sample_index_x = np.array(sample_index_x)
+sample_index_y = np.array(sample_index_y)
+
+print(sample_index_x[0])
+print(index_x)
+# print(index_y)
+print(len(index_x))
+
+LPH = lph(sample_index_x[0], sample_index_y[0])    # lph should be calculated for 100 coordinates
+
+print(LPH)
+print(LPH.shape)
+# test(x)
 cv2.waitKey(0)
