@@ -14,7 +14,7 @@ t = 4  # design parameter: threshold
 h = 5  # design parameter: window size
 
 # (width, height) = I.shape
-width = 10    # for testing assign smaller values
+width = 20    # for testing assign smaller values
 height = 10
 
 win = int((h-1)/2)
@@ -119,14 +119,18 @@ def subhist(sl):
 '''
 Function to find local pattern histogram (LPH)
 '''
-def lph():
+
+
+def lph(x, y):     # inserted two arguments
 
     lpdata = []
     sp = np.zeros((h, h), dtype=np.int)
     se = np.zeros((h, h), dtype=np.int)
     sn = np.zeros((h, h), dtype=np.int)
-    for x in range(win, width-win):
-        for y in range(win, height-win):
+    # for x in range(win, width-win):
+    while x:
+        #for y in range(win, height-win):
+        while y:
 
             for hw in range(-win, win+1):
                 for hh in range(-win, win+1):
@@ -156,16 +160,62 @@ def lph():
 
     featuredata = np.vstack(lpdata)
     return featuredata
+    # return lpdata
 
-LPH = lph()
-print(LPH.shape)
+# LPH = lph()
+# print(LPH.shape)
 # cv2.imshow('image', img)
 # print(LPH)  # it should print  features corresponding to all pixels
-""" saving features in pickle """
+# saving features in pickle
+'''
 with open('mlph_features.dat', "wb") as f:
     pickle.dump(LPH, f)
 
 with open('mlph_features.dat', 'rb') as f:
     print(pickle.load(f))
 
+'''
+''' Read Ground truth images for training
+5 classes and labels are given below
+lw -> water ->1
+lf -> flood plane -> 2
+li -> irrigation -> 3
+lv -> vegetation -> 4
+lu -> urban -> 5
+'''
+
+lw = cv2.imread("new_clipped_water.png", 0)
+lf = cv2.imread("new_clipped_floodplain.png", 0)
+li = cv2.imread("new_clipped_irrigation.png", 0)
+lv = cv2.imread("new_clipped_vegetation.png", 0)
+lu = cv2.imread("new_clipped_urban.png", 0)
+'''
+print(lw.shape)
+print(np.unique(lw, return_counts=True))
+
+print(lf.shape)
+print(np.unique(lf, return_counts=True))
+print(li.shape)
+print(np.unique(li, return_counts=True))
+print(lv.shape)
+print(np.unique(lv, return_counts=True))
+print(lu.shape)
+print(np.unique(lu, return_counts=True))
+'''
+
+index = np.argwhere(lw)
+# print(coordinates.shape)
+# print(index[:10])
+np.random.shuffle(index)
+# print(index[0:10])
+
+# print(lw[index[0:100, 0], index[0:100, 1]])
+# print(type(index))
+x = index[0:10, 0]
+y = index[0:10, 1]
+print(x)
+print(y)
+# LPH = lph(x, y)    # lph should be calculated for 100 coordinates
+# print(LPH)
+# print(LPH.shape)
 cv2.waitKey(0)
