@@ -10,7 +10,7 @@ I = np.array(img)
 # print(I.dtype)
 print(I.shape)
 
-t = 4  # design parameter: threshold
+t = [3, 5, 7]  # design parameter: threshold
 h = 5  # design parameter: window size
 num_classes = 5
 num_samples_each_class = 100
@@ -126,22 +126,24 @@ Function to find local pattern histogram (LPH)
 def lph(x, y):     # inserted two arguments
 
     lpdata = []
+
     sp = np.zeros((h, h), dtype=np.int)
     se = np.zeros((h, h), dtype=np.int)
     sn = np.zeros((h, h), dtype=np.int)
     # for x in range(win, width-win):
     for i in range(0, len(x)):
         # for y in range(win, height-win):
-        # for j in range(0, len(y)):
 
+        lphist = []
+        for j in range(len(t)):
             for hw in range(-win, win+1):
                 for hh in range(-win, win+1):
 
-                    if I[x[i]+hw, y[i]+hh] > (I[x[i], y[i]]+t):
+                    if I[x[i]+hw, y[i]+hh] > (I[x[i], y[i]]+t[j]):
                         sp[hw+win][hh+win] = 1
-                    elif (I[x[i], y[i]]-t) <= I[x[i]+hw, y[i]+hh] <= (I[x[i], y[i]]+t):
+                    elif (I[x[i], y[i]]-t[j]) <= I[x[i]+hw, y[i]+hh] <= (I[x[i], y[i]]+t[j]):
                         se[hw+win][hh+win] = 1
-                    elif I[x[i]+hw, y[i]+hh] < (I[x[i], y[i]]-t):
+                    elif I[x[i]+hw, y[i]+hh] < (I[x[i], y[i]]-t[j]):
                         sn[hw+win][hh+win] = 1
             # print('sp', sp)
             # print('se', se)
@@ -153,12 +155,14 @@ def lph(x, y):     # inserted two arguments
             # print('se label', se)
             # print('sn label', sn)
 
-            lphist = list(subhist(sp)) + list(np.delete(subhist(se), 0)) + list(np.delete(subhist(sn), 0))
-            lpdata.append(lphist)
+            lphist += list(np.delete(subhist(sp), 0)) + list(np.delete(subhist(se), 0)) + list(np.delete(subhist(sn), 0))
+
             # print(lphist)  # This is pixel by pixel feature .....want to store this in numpy array
             sp.fill(0)
             se.fill(0)
             sn.fill(0)
+
+        lpdata.append(lphist)
 
     featuredata = np.vstack(lpdata)
     return featuredata
@@ -240,12 +244,13 @@ with open('train_features.dat', "wb") as f:
 with open('train_features.dat', 'rb') as f:
     print(pickle.load(f))
 
+
 # saving true class data in pickle
 with open('target_class.dat', "wb") as f:
     pickle.dump(true_data, f)
 
-with open('target_class.dat', 'rb') as f:
-    print(pickle.load(f))
+# with open('target_class.dat', 'rb') as f:
+    # print(pickle.load(f))
 
 
 cv2.waitKey(0)
