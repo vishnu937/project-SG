@@ -1,7 +1,7 @@
 from svmutil import *
 
 m = svm_load_model('SVM_test_model')
-
+print(m)
 svm_type = m.get_svm_type()
 nr_class = m.get_nr_class()
 # svr_probability = m.get_svr_probability()

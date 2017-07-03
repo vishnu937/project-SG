@@ -7,17 +7,17 @@ import pickle
 
 img = cv2.imread('new_clipped_vh.tif', -1)   # read tiff image as it is
 I = np.array(img)
-# print(I.dtype)
+print(I.dtype)
 print(I.shape)
 
-t = [3, 5, 7]  # design parameter: threshold
+t = [2, 4, 9, 15]  # design parameter: threshold
 h = 5  # design parameter: window size
 num_classes = 5
-num_samples_each_class = 100
+num_samples_each_class = 200
 
-# (width, height) = I.shape
-width = 20    # for testing assign smaller values
-height = 10
+(width, height) = I.shape
+# width = 20    # for testing assign smaller values
+# height = 10
 
 win = int((h-1)/2)
 
@@ -183,9 +183,10 @@ li = cv2.imread("new_clipped_irrigation.png", 0)
 lv = cv2.imread("new_clipped_vegetation.png", 0)
 lu = cv2.imread("new_clipped_urban.png", 0)
 
-true_data = np.zeros(num_samples_each_class*num_classes, dtype=int)
+# true_data = np.zeros(num_samples_each_class*num_classes, dtype=int)
+true_data = np.zeros(num_samples_each_class*5, dtype=int)
 true_data[0:num_samples_each_class] = 1
-true_data[num_samples_each_class:2*num_samples_each_class] = 2
+true_data[1*num_samples_each_class:2*num_samples_each_class] = 2
 true_data[2*num_samples_each_class:3*num_samples_each_class] = 3
 true_data[3*num_samples_each_class:4*num_samples_each_class] = 4
 true_data[4*num_samples_each_class:5*num_samples_each_class] = 5
@@ -210,14 +211,14 @@ def get_sample_index(image):
     np.random.shuffle(coordinate)
     return coordinate[0:num_samples_each_class, 0], coordinate[0:num_samples_each_class, 1]
 
-index_x = np.zeros(num_samples_each_class*num_classes, dtype=int)
-index_y = np.zeros(num_samples_each_class*num_classes, dtype=int)
+index_x = np.zeros(num_samples_each_class*5, dtype=int)
+index_y = np.zeros(num_samples_each_class*5, dtype=int)
 
 # for water(1)
 index_x[0:num_samples_each_class], index_y[0:num_samples_each_class] = get_sample_index(lw)
-
+# index_x[num_samples_each_class:2*num_samples_each_class], index_y[num_samples_each_class:2*num_samples_each_class] = get_sample_index(lw)
 # for flood plane(2)
-index_x[num_samples_each_class:2*num_samples_each_class], index_y[num_samples_each_class:2*num_samples_each_class] = get_sample_index(lf)
+index_x[1*num_samples_each_class:2*num_samples_each_class], index_y[1*num_samples_each_class:2*num_samples_each_class] = get_sample_index(lf)
 
 # for irrigation(3)
 index_x[2*num_samples_each_class:3*num_samples_each_class], index_y[2*num_samples_each_class:3*num_samples_each_class] = get_sample_index(li)
