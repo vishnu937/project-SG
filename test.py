@@ -1,4 +1,21 @@
+import pickle
 from svmutil import *
+import numpy as np
+from matplotlib import pyplot as plt
+import cv2
+
+try:
+    with open('test_data.dat', 'rb') as f:
+        test_data = pickle.load(f)
+        print('test data size is:', test_data.shape)
+        # print(test_data)
+
+except:
+    print("Extracting test_data features again...")
+    try:
+        import get_test_data
+    except:
+        print("An exception occured!!")
 
 m = svm_load_model('SVM_test_model')
 print(m)
@@ -22,11 +39,34 @@ print('Totel SV = ', nr_sv)
 print('is probability model = ', is_prob_model)
 # print('SV coefficients = ', support_vector_coefficients)
 # print('Support Vectors', support_vectors)
+# print(len(test_data.tolist()))
 
+'''
+p_labs, p_acc, p_vals = svm_predict([0]*len(test_data.tolist()), test_data.tolist(), m)
+np_labels = np.array(p_labs)
+# saving predicted labels in pickle
+with open('predicted_labels.dat', "wb") as f:
+    pickle.dump(np_labels, f)
+'''
+with open('predicted_labels.dat', 'rb') as f:
+    np_labels = pickle.load(f)
+# print('list of predicted labels = ', p_labs)
+# print('classification accuracy  ,  mean squared error,   squared correlation coefficients ', p_acc)
+# print('list of decision values or probability estimates', p_vals)
+print('predicted labels size = ', np_labels.shape)
+# print(np_labels[0:10])
+resize_label = np.resize(np_labels, (496, 2251))
+print('resized shape = ', resize_label.shape)
 
+padded_labels = np.lib.pad(resize_label, 2, 'edge')
+padded_labels = padded_labels.astype(int)
+print('shape after padding', padded_labels.shape)
 
-
-
-
-
+# plt.imshow(padded_labels)
+# plt.show()
+list_labels = np.unique(padded_labels)
+print(list_labels)
+# for i in range(0, len(list_labels)):
+img_bgr = cv2.cvtColor(padded_labels, cv2.COLOR_GRAY2BGR)
+print(img_bgr.shape)
 
