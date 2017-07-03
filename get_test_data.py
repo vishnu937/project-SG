@@ -10,9 +10,9 @@ print(I.shape)
 t = [2, 4, 9, 15]  # design parameter: threshold
 h = 5  # design parameter: window size
 
-# (width, height) = I.shape
-width = 500    # for testing assign smaller values
-height = 2255
+(width, height) = I.shape
+# width = 500    # for testing assign smaller values
+# height = 2255
 
 win = int((h-1)/2)
 
