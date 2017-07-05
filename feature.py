@@ -1,11 +1,11 @@
 import numpy as np
 import cv2
-import pickle
 
 
 # img = cv2.imread("Rose.jpg", -1)
 
 img = cv2.imread('new_clipped_vh.tif', -1)   # read tiff image as it is
+# img = Image.open('new_clipped_vh.tif')
 I = np.array(img)
 print(I.dtype)
 print(I.shape)
@@ -236,22 +236,8 @@ index_x[4*num_samples_each_class:5*num_samples_each_class], index_y[4*num_sample
 LPH = lph(index_x, index_y)    # lph should be calculated for 100 coordinates
 
 # print(LPH)
-print(LPH.shape)
-
-# saving training features in pickle
-with open('train_features.dat', "wb") as f:
-    pickle.dump(LPH, f)
-
-with open('train_features.dat', 'rb') as f:
-    print(pickle.load(f))
-
-
-# saving true class data in pickle
-with open('target_class.dat', "wb") as f:
-    pickle.dump(true_data, f)
-
-# with open('target_class.dat', 'rb') as f:
-    # print(pickle.load(f))
-
+print('training data size = ', LPH.shape)
+np.save('train_features', LPH)
+np.save('target_class', true_data)
 
 cv2.waitKey(0)

@@ -10,9 +10,9 @@ print(I.shape)
 t = [2, 4, 9, 15]  # design parameter: threshold
 h = 5  # design parameter: window size
 
-(width, height) = I.shape
-# width = 500    # for testing assign smaller values
-# height = 2255
+# (width, height) = I.shape
+width = 10    # for testing assign smaller values
+height = 2255
 
 win = int((h-1)/2)
 
@@ -157,12 +157,17 @@ LPH = lph()    # lph should be calculated for 100 coordinates
 # print(LPH)
 print(LPH.shape)
 
+
+'''
 # saving training features in pickle
 with open('test_data.dat', "wb") as f:
-    pickle.dump(LPH, f)
+    pickle.dump(LPH, f, protocol=pickle.HIGHEST_PROTOCOL)
 
 with open('test_data.dat', 'rb') as f:
     print(pickle.load(f))
+'''
+np.save("test_data_by_numpy", LPH)
+# loaded_by_numpy = np.load("test_data_by_numpy.npy")
+# print(loaded_by_numpy.shape)
 
 
-cv2.waitKey(0)

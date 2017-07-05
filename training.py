@@ -1,17 +1,11 @@
-import pickle
 from svmutil import *
-# import numpy as np
+import numpy as np
 
 try:
-    with open('train_features.dat', 'rb') as f:
-        train_data = pickle.load(f)
-        print('feature size is:', train_data.shape)
-        # print(train_data)
-    with open('target_class.dat', 'rb') as f:
-        target_class = pickle.load(f)
-        # print(target_class)
-        print('true class label size', target_class.shape)
-
+    train_data = np.load('train_features.npy')
+    target_class = np.load('target_class.npy')
+    print('feature size is:', train_data.shape)
+    print('true class label size', target_class.shape)
 except:
     print("Extracting features again...")
     try:
@@ -19,6 +13,8 @@ except:
     except:
         print("An exception occured!!")
 
+
+# sys.path.append('D:\python soft\libsvm-3.22\libsvm-3.22\python')
 
 # print(train_data[0:10].tolist())
 # parm = svm_parameter(kernel_type = LINEAR, C = 10)
