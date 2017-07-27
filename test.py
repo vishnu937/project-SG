@@ -38,22 +38,25 @@ print('is probability model = ', is_prob_model)
 # print('Support Vectors', support_vectors)
 # print(len(test_data.tolist()))
 
-try:
-    np_labels = np.load('predicted_labels.npy')
-except:
-    y = [0]*len(test_data.tolist())
-    x = test_data.tolist()
-    p_labs, p_acc, p_vals = svm_predict(y, x, m)
-    np_labels = np.array(p_labs)
-    np.save('predicted_labels', np_labels)
+y = [0]*len(test_data.tolist())
+x = test_data.tolist()
+p_labs, p_acc, p_vals = svm_predict(y, x, m)
+np_labels = np.array(p_labs)
 
-
+'''
+print('saving predicted labels....')
+np.save('predicted_labels', np_labels)
+print('loading predicted labels....')
+np_labels = np.load('predicted_labels.npy')
+'''
 # print('list of predicted labels = ', p_labs)
 # print('classification accuracy  ,  mean squared error,   squared correlation coefficients ', p_acc)
 # print('list of decision values or probability estimates', p_vals)
+
+
 print('predicted labels size = ', np_labels.shape)
 # print(np_labels[0:10])
-resize_label = np.resize(np_labels, (496, 2251))
+resize_label = np.resize(np_labels, (2193, 2251))
 print('resized shape = ', resize_label.shape)
 
 padded_labels = np.lib.pad(resize_label, 2, 'edge')
@@ -71,14 +74,14 @@ for x in range(0, h):
 
             if padded_labels[x, y] == 1:   # water
                 rgb[x, y, 2] = 255   # blue
-            elif padded_labels[x, y] == 2:   # flood plane
-                rgb[x, y, 0] = 255   # yellow
-                rgb[x, y, 1] = 255
-            elif padded_labels[x, y] == 3:   # irrigation
+            # elif padded_labels[x, y] == 2:   # flood plane
+            #   rgb[x, y, 0] = 255   # yellow
+            #  rgb[x, y, 1] = 255
+            elif padded_labels[x, y] == 2:   # irrigation
                 rgb[x, y, 0] = 255    # Red
-            elif padded_labels[x, y] == 4:  # vegetation
+            elif padded_labels[x, y] == 3:  # vegetation
                 rgb[x, y, 1] = 255   # Green
-            elif padded_labels[x, y] == 5:   # urban # white
+            elif padded_labels[x, y] == 4:   # urban # white
                 rgb[x, y, 0:3] = 255
                 # rgb[x, y, 2] = 255
             else:

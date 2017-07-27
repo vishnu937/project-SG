@@ -1,18 +1,17 @@
 import numpy as np
 import cv2
-import pickle
 
-img = cv2.imread('new_clipped_vh.tif', -1)   # read tiff image as it is
+# img = cv2.imread('new_clipped_vh.tif', -1)   # read tiff image as it is
+img = cv2.imread('avg.tif', -1)
 I = np.array(img)
 print(I.dtype)
 print(I.shape)
 
-t = [2, 4, 9, 15]  # design parameter: threshold
+t = [2, 5, 9, 15, 25]  # design parameter: threshold
 h = 5  # design parameter: window size
-
-# (width, height) = I.shape
-width = 10    # for testing assign smaller values
-height = 2255
+(width, height) = I.shape
+# width = 10    # for testing assign smaller values
+# height = 2255
 
 win = int((h-1)/2)
 
@@ -144,14 +143,6 @@ def lph():     # inserted two arguments
     return featuredata
 
 
-''' Read Ground truth images for training
-5 classes and labels are given below
-lw -> water ->1
-lf -> flood plane -> 2
-li -> irrigation -> 3
-lv -> vegetation -> 4
-lu -> urban -> 5
-'''
 LPH = lph()    # lph should be calculated for 100 coordinates
 
 # print(LPH)

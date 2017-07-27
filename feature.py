@@ -1,28 +1,43 @@
 import numpy as np
 import cv2
-
-
-# img = cv2.imread("Rose.jpg", -1)
-
 img = cv2.imread('new_clipped_vh.tif', -1)   # read tiff image as it is
 # img = Image.open('new_clipped_vh.tif')
+
+img = cv2.convertScaleAbs(img)
+cv2.imwrite('in_int8_new_clipped_vh.tif', img)
 I = np.array(img)
 print(I.dtype)
 print(I.shape)
 
-t = [2, 4, 9, 15]  # design parameter: threshold
+
+padded_I = np.lib.pad(I, 1, 'edge')
+avg_I = np.zeros(I.shape, dtype=np.int)
+
+(wi, hei) = padded_I.shape
+for i in range(1, wi-1):
+    for j in range(1, hei-1):
+        for p in range(-1, 2):
+            for q in range(-1, 2):
+
+                avg_I[i-1, j-1] += padded_I[i+p, j+q]
+
+        I[i-1, j-1] = int(avg_I[i-1, j-1]/9)
+
+cv2.imwrite("avg.tif", I)
+
+
+num_classes = 4
+num_samples_each_class = 2000
+(width, height) = padded_I.shape
+# width = 200    # for testing assign smaller values
+# height = 200
+
+t = [2, 5, 9, 15, 25]  # design parameter: threshold
 h = 5  # design parameter: window size
-num_classes = 5
-num_samples_each_class = 200
-
-(width, height) = I.shape
-# width = 20    # for testing assign smaller values
-# height = 10
-
 win = int((h-1)/2)
-
-
 # connected component labeling
+
+
 def label(s):
     # sl = np.array([[0 for p in range(h)]for q in range(h)])
     sl = np.zeros((h, h), dtype=np.int)
@@ -171,25 +186,25 @@ def lph(x, y):     # inserted two arguments
 ''' Read Ground truth images for training
 5 classes and labels are given below
 lw -> water ->1
-lf -> flood plane -> 2
-li -> irrigation -> 3
-lv -> vegetation -> 4
-lu -> urban -> 5
+# lf -> flood plane -> 
+li -> irrigation -> 2
+lv -> vegetation -> 3
+lu -> urban -> 4
 '''
 
 lw = cv2.imread("new_clipped_water.png", 0)
-lf = cv2.imread("new_clipped_floodplain.png", 0)
+# lf = cv2.imread("new_clipped_floodplain.png", 0)
 li = cv2.imread("new_clipped_irrigation.png", 0)
 lv = cv2.imread("new_clipped_vegetation.png", 0)
 lu = cv2.imread("new_clipped_urban.png", 0)
 
-# true_data = np.zeros(num_samples_each_class*num_classes, dtype=int)
-true_data = np.zeros(num_samples_each_class*5, dtype=int)
+true_data = np.zeros(num_samples_each_class*num_classes, dtype=int)
+# true_data = np.zeros(num_samples_each_class*5, dtype=int)
 true_data[0:num_samples_each_class] = 1
 true_data[1*num_samples_each_class:2*num_samples_each_class] = 2
 true_data[2*num_samples_each_class:3*num_samples_each_class] = 3
 true_data[3*num_samples_each_class:4*num_samples_each_class] = 4
-true_data[4*num_samples_each_class:5*num_samples_each_class] = 5
+# true_data[4*num_samples_each_class:5*num_samples_each_class] = 5
 # print(true_data)
 '''
 print(lw.shape)
@@ -204,30 +219,27 @@ print(np.unique(lv, return_counts=True))
 print(lu.shape)
 print(np.unique(lu, return_counts=True))
 '''
-
-
 def get_sample_index(image):
     coordinate = np.argwhere(image)
     np.random.shuffle(coordinate)
     return coordinate[0:num_samples_each_class, 0], coordinate[0:num_samples_each_class, 1]
 
-index_x = np.zeros(num_samples_each_class*5, dtype=int)
-index_y = np.zeros(num_samples_each_class*5, dtype=int)
+index_x = np.zeros(num_samples_each_class*num_classes, dtype=int)
+index_y = np.zeros(num_samples_each_class*num_classes, dtype=int)
 
 # for water(1)
 index_x[0:num_samples_each_class], index_y[0:num_samples_each_class] = get_sample_index(lw)
-# index_x[num_samples_each_class:2*num_samples_each_class], index_y[num_samples_each_class:2*num_samples_each_class] = get_sample_index(lw)
 # for flood plane(2)
-index_x[1*num_samples_each_class:2*num_samples_each_class], index_y[1*num_samples_each_class:2*num_samples_each_class] = get_sample_index(lf)
+index_x[1*num_samples_each_class:2*num_samples_each_class], index_y[1*num_samples_each_class:2*num_samples_each_class] = get_sample_index(li)
 
 # for irrigation(3)
-index_x[2*num_samples_each_class:3*num_samples_each_class], index_y[2*num_samples_each_class:3*num_samples_each_class] = get_sample_index(li)
+index_x[2*num_samples_each_class:3*num_samples_each_class], index_y[2*num_samples_each_class:3*num_samples_each_class] = get_sample_index(lv)
 
 # for vegetation(4)
-index_x[3*num_samples_each_class:4*num_samples_each_class], index_y[3*num_samples_each_class:4*num_samples_each_class] = get_sample_index(lv)
+index_x[3*num_samples_each_class:4*num_samples_each_class], index_y[3*num_samples_each_class:4*num_samples_each_class] = get_sample_index(lu)
 
 # for urban(5)
-index_x[4*num_samples_each_class:5*num_samples_each_class], index_y[4*num_samples_each_class:5*num_samples_each_class] = get_sample_index(lu)
+# index_x[4*num_samples_each_class:5*num_samples_each_class], index_y[4*num_samples_each_class:5*num_samples_each_class] = get_sample_index(lu)
 
 # print(index_x)
 # print(index_y)

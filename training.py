@@ -19,11 +19,13 @@ except:
 # print(train_data[0:10].tolist())
 # parm = svm_parameter(kernel_type = LINEAR, C = 10)
 # -s 0 C-SVM (multiclass classification) - default
-parm = svm_parameter('-s 0 -t 0 -c 10')
-prob = svm_problem(target_class.tolist(), train_data.tolist())
-# parm.cross_validation = 1
-# parm.nr_fold = 10
+parm = svm_parameter('-s 0 -t 0 -c 10 -h 0')
+y = target_class.tolist()
+x = train_data.tolist()
+prob = svm_problem(y, x)
+parm.cross_validation = 1
+parm.nr_fold = 5
 m = svm_train(prob, parm)
 
-svm_save_model('SVM_test_model', m)
+# svm_save_model('SVM_test_model', m)
 
